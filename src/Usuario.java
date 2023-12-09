@@ -18,6 +18,7 @@ public class Usuario {
         validarCedulaEcuatoriana(cedula);
         validarCorreo(correo);
         validarContrasena(contrasena);
+        this.direccionEntrega = direccion;
         this.historialPedidos = new LinkedList<>();
         this.billetera = new HashSet<>();
     }
@@ -127,6 +128,16 @@ public class Usuario {
         }
         this.contrasena = contrasena;
     }
+
+    public void editarPerfil(String nuevoNombre, String nuevoApellido, String nuevaCedula, String nuevoCorreo, String nuevaContrasena, Direccion nuevaDireccion) {
+        // Validar los nuevos datos antes de realizar la edición
+        validarNombreApellido(nuevoNombre, nuevoApellido);
+        validarCedulaEcuatoriana(nuevaCedula);
+        validarCorreo(nuevoCorreo);
+        validarContrasena(nuevaContrasena);
+        this.direccionEntrega = nuevaDireccion;
+    }
+
 
     public String getNombre() {
         return nombre;

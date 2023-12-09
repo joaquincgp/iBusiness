@@ -143,14 +143,6 @@
                   <text value="Contraseña:"/>
                 </properties>
               </component>
-              <component id="91866" class="javax.swing.JTextField" binding="txtContrasena">
-                <constraints>
-                  <grid row="9" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="-1"/>
-                  </grid>
-                </constraints>
-                <properties/>
-              </component>
               <component id="9f520" class="javax.swing.JButton" binding="registrarButton" default-binding="true">
                 <constraints>
                   <grid row="17" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -326,6 +318,14 @@
                   <text value="Direccion"/>
                 </properties>
               </component>
+              <component id="aab35" class="javax.swing.JPasswordField" binding="txtPasswordRegistro">
+                <constraints>
+                  <grid row="9" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties/>
+              </component>
             </children>
           </grid>
           <grid id="b20c8" binding="panelPedidos" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
@@ -421,14 +421,6 @@
                 <properties>
                   <text value="Contraseña:"/>
                 </properties>
-              </component>
-              <component id="7bc6b" class="javax.swing.JTextField" binding="txtContrasenaEditar">
-                <constraints>
-                  <grid row="3" column="1" row-span="1" col-span="2" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="-1"/>
-                  </grid>
-                </constraints>
-                <properties/>
               </component>
               <component id="b6abd" class="javax.swing.JButton" binding="guardarCambiosButton" default-binding="true">
                 <constraints>
@@ -601,16 +593,6 @@
                   <text value="Direccion actual"/>
                 </properties>
               </component>
-              <component id="cfcb1" class="javax.swing.JTextArea" binding="txtDireccionActual">
-                <constraints>
-                  <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="50"/>
-                  </grid>
-                </constraints>
-                <properties>
-                  <text value=""/>
-                </properties>
-              </component>
               <component id="df6c1" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
                 <constraints>
                   <grid row="12" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
@@ -659,20 +641,44 @@
                   <text value="Agregar metodo de pago"/>
                 </properties>
               </component>
-              <component id="3d1db" class="javax.swing.JButton" binding="buscarUsuarioButton" default-binding="true">
-                <constraints>
-                  <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Buscar usuario"/>
-                </properties>
-              </component>
               <component id="3f278" class="javax.swing.JButton" binding="editarMetodoDePagoButton" default-binding="true">
                 <constraints>
                   <grid row="12" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <text value="Editar metodo de pago"/>
+                </properties>
+              </component>
+              <component id="c2695" class="javax.swing.JTextArea" binding="textAreaDireccion">
+                <constraints>
+                  <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="50"/>
+                  </grid>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="101d8" class="javax.swing.JPasswordField" binding="txtPasswordEditar">
+                <constraints>
+                  <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="3d1db" class="javax.swing.JButton" binding="buscarUsuarioButton" default-binding="true">
+                <constraints>
+                  <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Buscar usuario"/>
+                </properties>
+              </component>
+              <component id="13403" class="javax.swing.JButton" binding="verFormasDePagoButton" default-binding="true">
+                <constraints>
+                  <grid row="10" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="Ver formas de pago"/>
                 </properties>
               </component>
             </children>

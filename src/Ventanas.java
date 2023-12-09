@@ -1,10 +1,12 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public class Ventanas {
+public class Ventanas extends Component {
     private JTabbedPane tabbedPane1;
     private JPanel panelRegistro;
     private JPanel panelPedidos;
@@ -38,6 +40,10 @@ public class Ventanas {
     private JList metodosDePagoList;
     private JButton agregarMetodoDePagoButton;
     private JButton editarMetodoDePagoButton;
+    private JTextArea textAreaDireccion;
+    private JPasswordField txtPasswordEditar;
+    private JPasswordField txtPasswordRegistro;
+    private JButton verFormasDePagoButton;
     private Set<Usuario> usuariosRegistrados = new HashSet<>();
 
     public Ventanas() {
@@ -54,7 +60,7 @@ public class Ventanas {
                     apellido = txtApellido.getText();
                     cedula = txtCedula.getText();
                     correo = txtCorreo.getText();
-                    contrasena = txtContrasena.getText();
+                    contrasena = txtPasswordRegistro.getText();
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null, "Algun campo esta vacio");
                 }
@@ -102,7 +108,7 @@ public class Ventanas {
                 String contrasena = null;
                 try{
                     usuario = txtUsuarioEditar.getText();
-                    contrasena = txtContrasenaEditar.getText();
+                    contrasena = txtPasswordEditar.getText();
                     if(usuario == null || usuario.isEmpty() || contrasena == null || contrasena.isEmpty()){
                         throw new Exception("Campos vacios");
                     }
@@ -119,11 +125,85 @@ public class Ventanas {
                     apellidoActual.setText(usuarioBuscado.getApellido());
                     correoActual.setText(usuarioBuscado.getCorreo());
                     contrasenaActual.setText(usuarioBuscado.getContrasena());
-                    txtDireccionActual.setText(usuarioBuscado.getDireccionEntrega().toString());
+                    textAreaDireccion.setText(usuarioBuscado.getDireccionEntrega().toString());
 
                 }
             }
         });
+        verFormasDePagoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarVentanaAutenticacion();
+            }
+        });
+    }
+
+    private void mostrarVentanaAutenticacion() {
+        // Crear un panel para solicitar la información de autenticación
+        JPanel panel = new JPanel(new GridLayout(2, 2));
+        JTextField txtUsuario = new JTextField();
+        JPasswordField txtContrasena = new JPasswordField();
+        panel.add(new JLabel("Usuario:"));
+        panel.add(txtUsuario);
+        panel.add(new JLabel("Contraseña:"));
+        panel.add(txtContrasena);
+
+        // Mostrar el cuadro de diálogo modal
+        int opcion = JOptionPane.showConfirmDialog(this, panel, "Autenticación", JOptionPane.OK_CANCEL_OPTION);
+
+        // Verificar la opción seleccionada y la información de autenticación
+        if (opcion == JOptionPane.OK_OPTION) {
+            String usuario = txtUsuario.getText();
+            String contrasena = new String(txtContrasena.getPassword());
+            Usuario user = buscarUsuario(usuariosRegistrados, usuario, contrasena);
+            // Realizar la autenticación (verificar usuario y contraseña)
+            if (user != null) {
+                // Si la autenticación es exitosa, mostrar la ventana de métodos de pago
+                mostrarMetodosPago(user);
+            } else {
+                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void mostrarVentanaAgregarMetodoPago(Usuario user) {
+        // Crear un panel para solicitar la información de autenticación
+        JPanel panel = new JPanel(new GridLayout(2, 5));
+        JTextField txtTitular = new JTextField();
+        JTextField txtNumeroTarjeta = new JTextField();
+        JTextField txtFechaVencimiento = new JTextField();
+        JTextField codigoSeguridad = new JTextField();
+        String[] opciones = {"CREDITO", "DEBITO"};
+        JComboBox<String> cboOpciones = new JComboBox<>(opciones);
+
+        panel.add(new JLabel("Titular:"));
+        panel.add(txtTitular);
+        panel.add(new JLabel("Numero de tarjeta:"));
+        panel.add(txtNumeroTarjeta);
+        panel.add(new JLabel("Fecha de vencimiento:"));
+        panel.add(txtFechaVencimiento);
+        panel.add(new JLabel("CVV:"));
+        panel.add(codigoSeguridad);
+        panel.add(new JLabel("Tipo:"));
+        panel.add(cboOpciones);
+
+        // Mostrar el cuadro de diálogo modal
+        int opcion = JOptionPane.showConfirmDialog(this, panel, "Autenticación", JOptionPane.OK_CANCEL_OPTION);
+
+        // Verificar la opción seleccionada y la información de autenticación
+        if (opcion == JOptionPane.OK_OPTION) {
+            String titular = txtTitular.getText();
+            String numero = txtNumeroTarjeta.getText();
+
+            Usuario user = buscarUsuario(usuariosRegistrados, usuario, contrasena);
+            // Realizar la autenticación (verificar usuario y contraseña)
+            if (user != null) {
+                // Si la autenticación es exitosa, mostrar la ventana de métodos de pago
+                mostrarMetodosPago(user);
+            } else {
+                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     public static Usuario buscarUsuario(Set<Usuario> usuariosRegistrados, String correo, String contrasena) {
@@ -136,8 +216,13 @@ public class Ventanas {
     }
 
 
-    public void llenarInformacion(){
-
+    private void mostrarMetodosPago(Usuario user){
+        List<MetodoPago> listado = (List<MetodoPago>) user.getBilletera();
+        DefaultListModel dlm =new DefaultListModel();
+        for(MetodoPago mp:listado){
+            dlm.addElement(mp.toString());
+        }
+        metodosDePagoList.setModel(dlm);
     }
 
     public void limpiarCampos(){
@@ -145,7 +230,7 @@ public class Ventanas {
         txtApellido.setText("");
         txtCedula.setText("");
         txtCorreo.setText("");
-        txtContrasena.setText("");
+        txtPasswordRegistro.setText("");
         txtCalle1.setText("");
         txtCalle2.setText("");
         txtCiudad.setText("");
