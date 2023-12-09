@@ -625,14 +625,6 @@
                   <text value="Metodos de pago"/>
                 </properties>
               </component>
-              <component id="3bc1c" class="javax.swing.JList" binding="metodosDePagoList">
-                <constraints>
-                  <grid row="11" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                    <preferred-size width="150" height="50"/>
-                  </grid>
-                </constraints>
-                <properties/>
-              </component>
               <component id="10fc4" class="javax.swing.JButton" binding="agregarMetodoDePagoButton" default-binding="true">
                 <constraints>
                   <grid row="12" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
@@ -670,7 +662,7 @@
                   <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Buscar usuario"/>
+                  <text value="Iniciar sesion"/>
                 </properties>
               </component>
               <component id="13403" class="javax.swing.JButton" binding="verFormasDePagoButton" default-binding="true">
@@ -680,6 +672,14 @@
                 <properties>
                   <text value="Ver formas de pago"/>
                 </properties>
+              </component>
+              <component id="56904" class="javax.swing.JTextArea" binding="metodosPagoTextArea">
+                <constraints>
+                  <grid row="11" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="50"/>
+                  </grid>
+                </constraints>
+                <properties/>
               </component>
             </children>
           </grid>

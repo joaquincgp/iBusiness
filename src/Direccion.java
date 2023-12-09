@@ -22,11 +22,11 @@ public class Direccion {
 //Validaciones para inicializar atributos
     private void validarCalles(String callePrincipal, String calleSecundaria) {
         if (callePrincipal == null || callePrincipal.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "La direccion esta incompleta o vacia", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Datos incompletos", "Error", JOptionPane.ERROR_MESSAGE);
             throw new IllegalArgumentException("La calle principal no puede ser nula o vacía");
         }
         if (calleSecundaria == null || calleSecundaria.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "La direccion esta incompleta o vacia", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Datos incompletos", "Error", JOptionPane.ERROR_MESSAGE);
             throw new IllegalArgumentException("La calle secundaria no puede ser nula o vacía");
         }
         this.callePrincipal = callePrincipal;
@@ -35,7 +35,7 @@ public class Direccion {
 
     private void validarCiudad(String ciudad) {
         if (ciudad == null || ciudad.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "La direccion esta incompleta o vacia", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Datos incomppletos", "Error", JOptionPane.ERROR_MESSAGE);
             throw new IllegalArgumentException("La direccion esta incompleta o vacia");
         }
         this.ciudad = ciudad;

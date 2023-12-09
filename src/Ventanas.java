@@ -46,10 +46,16 @@ public class Ventanas extends Component {
     private JPasswordField txtPasswordEditar;
     private JPasswordField txtPasswordRegistro;
     private JButton verFormasDePagoButton;
+    private JTextArea metodosPagoTextArea;
     private Set<Usuario> usuariosRegistrados = new HashSet<>();
     private Usuario userAux = null;
 
+    //Datos quemados para pruebas
+    Direccion aux = new Direccion("hdahda", "ahdhada", "Tungurahua","ajsoja", "190101", "dadad" );
+
     public Ventanas() {
+        //Dato quemado
+        usuariosRegistrados.add(new Usuario("John", "Sanchez", "1805226048","j@gmail.com","chacon#123", aux));
         registrarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -137,45 +143,36 @@ public class Ventanas extends Component {
         verFormasDePagoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mostrarVentanaAutenticacion();
-                mostrarMetodosPago(userAux);
+                if(userAux==null){
+                    JOptionPane.showMessageDialog(null, "No se ha iniciado sesion", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException("No se inicia sesion");
+                }
+                autenticacion();
+
             }
         });
         agregarMetodoDePagoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(userAux==null){
+                    JOptionPane.showMessageDialog(null, "No se ha iniciado sesion", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException("No se inicia sesion");
+                }
                 mostrarVentanaAgregarMetodoPago();
+
             }
         });
     }
 
-    private void mostrarVentanaAutenticacion() {
-        // Crear un panel para solicitar la información de autenticación
-        JPanel panel = new JPanel(new GridLayout(2, 2));
-        JTextField txtUsuario = new JTextField();
-        JPasswordField txtContrasena = new JPasswordField();
-        panel.add(new JLabel("Usuario:"));
-        panel.add(txtUsuario);
-        panel.add(new JLabel("Contraseña:"));
-        panel.add(txtContrasena);
-
-        // Mostrar el cuadro de diálogo modal
-        int opcion = JOptionPane.showConfirmDialog(this, panel, "Autenticación", JOptionPane.OK_CANCEL_OPTION);
-
-        // Verificar la opción seleccionada y la información de autenticación
-        if (opcion == JOptionPane.OK_OPTION) {
-            String usuario = txtUsuario.getText();
-            String contrasena = new String(txtContrasena.getPassword());
-            Usuario user = buscarUsuario(usuariosRegistrados, usuario, contrasena);
-            userAux = user;
+    private void autenticacion() {
             // Realizar la autenticación (verificar usuario y contraseña)
-            if (user != null) {
+            if (userAux.getBilletera()!=null) {
                 // Si la autenticación es exitosa, mostrar la ventana de métodos de pago
-                mostrarMetodosPago(user);
-            } else {
-                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error", JOptionPane.ERROR_MESSAGE);
+                mostrarMetodosPago(userAux);
+            }else{
+                JOptionPane.showMessageDialog(null, "No hay metodos de pagos asociados a este usuario", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        }
+
     }
 
     private void mostrarVentanaAgregarMetodoPago() {
@@ -204,28 +201,37 @@ public class Ventanas extends Component {
 
         // Verificar la opción seleccionada y la información de autenticación
         if (opcion == JOptionPane.OK_OPTION) {
-            String titular = txtTitular.getText();
-            String numero = txtNumeroTarjeta.getText();
-            String fechaString = txtFechaVencimiento.getText();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            // Convertir el String a LocalDate
-            LocalDate fecha = LocalDate.parse(fechaString, formatter);
-            int codigo = Integer.parseInt(codigoSeguridad.getText());
-            String tipo = (String) cboOpciones.getSelectedItem();
-            MetodoPago nuevoMetodoPago = new MetodoPago(titular, numero, fecha, codigo, tipo);
-
-            try {
-                userAux.agregarMetodoPago(nuevoMetodoPago);  //SE AGREGA EL METODO DE PAGO
-                JOptionPane.showMessageDialog(this, "Metodo de pago agregado");
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "El metodo de pago no se pudo ingresar", "Error", JOptionPane.ERROR_MESSAGE);
-
+            String titular = null;
+            String numero = null;
+            String fechaString = null;
+            LocalDate fecha = null;
+            int codigo = 0;
+            String tipo = null;
+            try{
+                titular = txtTitular.getText();
+                numero = txtNumeroTarjeta.getText();
+                fechaString = txtFechaVencimiento.getText();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                // Convertir el String a LocalDate
+                fecha = LocalDate.parse(fechaString, formatter);
+                codigo = Integer.parseInt(codigoSeguridad.getText());
+                tipo = (String) cboOpciones.getSelectedItem();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Algun dato no tiene el formato apropiado", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
-            // Realizar la autenticación (verificar usuario y contraseña)
+            MetodoPago nuevoMetodoPago = new MetodoPago(titular, numero, fecha, codigo, tipo);
+
+            try{
+                userAux.agregarMetodoPago(nuevoMetodoPago);  //SE AGREGA EL METODO DE PAGO
+            }catch (Exception e){
+                JOptionPane.showMessageDialog(null, "Metodo de pago no pudo agregarse");
+            }
+            JOptionPane.showMessageDialog(null, "Metodo de pago agregado");
+
+
+
             if (userAux != null) {
-                // Si la autenticación es exitosa, mostrar la ventana de métodos de pago
                 mostrarMetodosPago(userAux);
             }
         }
@@ -242,18 +248,19 @@ public class Ventanas extends Component {
 
 
     private void mostrarMetodosPago(Usuario user){
-        List<MetodoPago> listado = null;
+        metodosPagoTextArea.setText("");
+        Set<MetodoPago> listado = null;
         try{
             listado = user.getBilletera();
         }catch (NullPointerException ex ){
-            JOptionPane.showMessageDialog(this, "El usuario no tiene metodos de pago", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "El usuario no tiene metodos de pago", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-
-        DefaultListModel dlm =new DefaultListModel();
-        for(MetodoPago mp: listado){
-            dlm.addElement(mp.toString());
+        int cont = 1;
+        for (MetodoPago mp : listado) {
+            metodosPagoTextArea.append("TARJETA "+cont+'\n'+mp.toString());
+            cont = cont +1;
         }
-        metodosDePagoList.setModel(dlm);
     }
 
     public void limpiarCampos(){

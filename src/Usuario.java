@@ -11,7 +11,8 @@ public class Usuario {
     private String contrasena;
     public Direccion direccionEntrega;
     private LinkedList<Pedido> historialPedidos;
-    private List<MetodoPago> billetera;
+    private Set<MetodoPago> billetera;
+
 
     public Usuario(String nombre, String apellido, String cedula, String correo, String contrasena, Direccion direccion) {
         validarNombreApellido(nombre, apellido);
@@ -20,7 +21,7 @@ public class Usuario {
         validarContrasena(contrasena);
         this.direccionEntrega = direccion;
         this.historialPedidos = new LinkedList<>();
-        this.billetera = new ArrayList<>();
+        this.billetera = new HashSet<>();
     }
 
     //Metodos de validacion para poder asignar las variables en el constructor
@@ -192,11 +193,11 @@ public class Usuario {
         this.historialPedidos = historialPedidos;
     }
 
-    public List<MetodoPago> getBilletera() {
+    public Set<MetodoPago> getBilletera() {
         return billetera;
     }
 
-    public void setBilletera(ArrayList<MetodoPago> billetera) {
+    public void setBilletera(Set<MetodoPago> billetera) {
         this.billetera = billetera;
     }
 

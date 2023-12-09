@@ -17,12 +17,13 @@ public class MetodoPago {
             this.titular = titular;
         }else{
             JOptionPane.showMessageDialog(null, "El titular debe tener nombre y apellido", "Error", JOptionPane.ERROR_MESSAGE);
-
+            throw new RuntimeException("El titular no tiene nombre o apellido");
         }
         if(esNumeroTarjetaValido(numeroTarjeta) && !numeroTarjeta.isEmpty()){
             this.numeroTarjeta = numeroTarjeta;
         }else{
             JOptionPane.showMessageDialog(null, "El numero de tarjeta no es valido", "Error", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException("El numero no es valido");
         }
         if(esFechaVencimientoValida(fechaVencimiento)){
             this.fechaVencimiento = fechaVencimiento;
@@ -34,13 +35,13 @@ public class MetodoPago {
             this.codigoSeguridad = codigoSeguridad;
         } else {
             JOptionPane.showMessageDialog(null, "El código de seguridad debe tener 3 dígitos.", "Error", JOptionPane.ERROR_MESSAGE);
+            throw new RuntimeException("El codigo debe tener 3 digitos");
         }
         Tipo tipoEnum = null;
         try{
             tipoEnum = Tipo.valueOf(tipoString);
         }catch (IllegalArgumentException e ){
             JOptionPane.showMessageDialog(null, "Solo puede ser de credito o debito", "Error", JOptionPane.ERROR_MESSAGE);
-
         }
         this.tipoDeTarjeta = tipoEnum;
     }
