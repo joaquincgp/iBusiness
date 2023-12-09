@@ -1,7 +1,7 @@
 import javax.swing.*;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 public class Usuario {
     private String nombre;
@@ -11,7 +11,7 @@ public class Usuario {
     private String contrasena;
     public Direccion direccionEntrega;
     private LinkedList<Pedido> historialPedidos;
-    private Set<MetodoPago> billetera;
+    private List<MetodoPago> billetera;
 
     public Usuario(String nombre, String apellido, String cedula, String correo, String contrasena, Direccion direccion) {
         validarNombreApellido(nombre, apellido);
@@ -20,10 +20,10 @@ public class Usuario {
         validarContrasena(contrasena);
         this.direccionEntrega = direccion;
         this.historialPedidos = new LinkedList<>();
-        this.billetera = new HashSet<>();
+        this.billetera = new ArrayList<>();
     }
 
-//Metodos de validacion para poder asignar las variables en el constructor
+    //Metodos de validacion para poder asignar las variables en el constructor
     private void validarNombreApellido(String nombre, String apellido) {
         if (nombre == null || nombre.isEmpty()) {
             JOptionPane.showMessageDialog(null, "El nombre y el apellido no pueden estar vacios", "Error", JOptionPane.ERROR_MESSAGE);
@@ -138,6 +138,10 @@ public class Usuario {
         this.direccionEntrega = nuevaDireccion;
     }
 
+    public void agregarMetodoPago(MetodoPago nuevoMetodoPago) {
+        billetera.add(nuevoMetodoPago);
+    }
+
 
     public String getNombre() {
         return nombre;
@@ -188,11 +192,11 @@ public class Usuario {
         this.historialPedidos = historialPedidos;
     }
 
-    public Set<MetodoPago> getBilletera() {
+    public List<MetodoPago> getBilletera() {
         return billetera;
     }
 
-    public void setBilletera(Set<MetodoPago> billetera) {
+    public void setBilletera(ArrayList<MetodoPago> billetera) {
         this.billetera = billetera;
     }
 
