@@ -105,6 +105,10 @@ public class Direccion {
         this.referencia = referencia;
     }
 
+    public String getProvincia() {
+        return provincia;
+    }
+
     @Override
     public String toString() {
         return "Direccion" + '\n'+

@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class Ventanas extends Component {
@@ -29,16 +28,13 @@ public class Ventanas extends Component {
     private JTextField txtContrasenaEditar;
     private JButton guardarCambiosButton;
     private JLabel nombreActual;
-    private JTextField txtNuevoNombre;
     private JLabel apellidoActual;
     private JTextField textField1;
     private JButton buscarUsuarioButton;
     private JLabel correoActual;
-    private JTextField txtNuevoCorreo;
     private JLabel contrasenaActual;
     private JTextField textField2;
     private JTextArea txtDireccionActual;
-    private JComboBox comboBox1;
     private JList metodosDePagoList;
     private JButton agregarMetodoDePagoButton;
     private JButton editarMetodoDePagoButton;
@@ -47,6 +43,12 @@ public class Ventanas extends Component {
     private JPasswordField txtPasswordRegistro;
     private JButton verFormasDePagoButton;
     private JTextArea metodosPagoTextArea;
+    private JPanel panelPerfil;
+    private JLabel callePActual;
+    private JTextArea textAreaDirActual;
+    private JButton editarDireccionButton;
+    private JTextField txtNuevoNombre;
+    private JTextField txtNuevoCorreo;
     private Set<Usuario> usuariosRegistrados = new HashSet<>();
     private Usuario userAux = null;
 
@@ -135,7 +137,8 @@ public class Ventanas extends Component {
                     apellidoActual.setText(usuarioBuscado.getApellido());
                     correoActual.setText(usuarioBuscado.getCorreo());
                     contrasenaActual.setText("********");
-                    textAreaDireccion.setText(usuarioBuscado.getDireccionEntrega().toString());
+                    textAreaDirActual.setText(usuarioBuscado.getDireccionEntrega().toString());
+
 
                 }
             }
@@ -147,7 +150,12 @@ public class Ventanas extends Component {
                     JOptionPane.showMessageDialog(null, "No se ha iniciado sesion", "Error", JOptionPane.ERROR_MESSAGE);
                     throw new RuntimeException("No se inicia sesion");
                 }
-                autenticacion();
+                if (!userAux.getBilletera().isEmpty()) {
+                    // Si la autenticación es exitosa, mostrar la ventana de métodos de pago
+                    mostrarMetodosPago(userAux);
+                }else{
+                    JOptionPane.showMessageDialog(null, "No hay metodos de pagos asociados a este usuario", "Error", JOptionPane.ERROR_MESSAGE);
+                }
 
             }
         });
@@ -159,20 +167,85 @@ public class Ventanas extends Component {
                     throw new RuntimeException("No se inicia sesion");
                 }
                 mostrarVentanaAgregarMetodoPago();
+            }
+        });
 
+        editarDireccionButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(userAux==null){
+                    JOptionPane.showMessageDialog(null, "No se ha iniciado sesion", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException("No se inicia sesion");
+                }
+                mostrarVentanaEditarDireccion();
             }
         });
     }
 
-    private void autenticacion() {
-            // Realizar la autenticación (verificar usuario y contraseña)
-            if (userAux.getBilletera()!=null) {
-                // Si la autenticación es exitosa, mostrar la ventana de métodos de pago
-                mostrarMetodosPago(userAux);
-            }else{
-                JOptionPane.showMessageDialog(null, "No hay metodos de pagos asociados a este usuario", "Error", JOptionPane.ERROR_MESSAGE);
+    private void mostrarVentanaEditarDireccion() {
+        // Crear un panel para solicitar la información de autenticación
+        JPanel panel = new JPanel(new GridLayout(6, 2));
+        JTextField txtCallePrincipal = new JTextField();
+        JTextField txtCalleSecundaria = new JTextField();
+        JTextField txtCiudad = new JTextField();
+        JTextField txtCodigoPostal = new JTextField();
+        JTextField txtReferencia = new JTextField();
+        JTextField txtProvincia = new JTextField();
+
+
+        panel.add(new JLabel("Calle principal:"));
+        panel.add(txtCallePrincipal);
+        txtCallePrincipal.setText(userAux.getDireccionEntrega().getCallePrincipal());
+        panel.add(new JLabel("Calle secundaria:"));
+        panel.add(txtCalleSecundaria);
+        txtCalleSecundaria.setText(userAux.getDireccionEntrega().getCalleSecundaria());
+        panel.add(new JLabel("Ciudad:"));
+        panel.add(txtCiudad);
+        txtCiudad.setText(userAux.getDireccionEntrega().getCiudad());
+        panel.add(new JLabel("Provincia"));
+        panel.add(txtProvincia);
+        txtProvincia.setText(userAux.getDireccionEntrega().getProvincia());
+        panel.add(new JLabel("Codigo postal:"));
+        panel.add(txtCodigoPostal);
+        txtCodigoPostal.setText(userAux.getDireccionEntrega().getCodigoPostal());
+        panel.add(new JLabel("Referencia:"));
+        panel.add(txtReferencia);
+        txtReferencia.setText(userAux.getDireccionEntrega().getReferencia());
+
+        // Mostrar el cuadro de diálogo modal
+        int opcion = JOptionPane.showConfirmDialog(this, panel, "Nueva direccion", JOptionPane.OK_CANCEL_OPTION);
+
+        // Verificar la opción seleccionada y la información de autenticación
+        if (opcion == JOptionPane.OK_OPTION) {
+            String callePrincipal = null;
+            String calleSecundaria = null;
+            String ciudad = null;
+            String provincia = null;
+            String zip = null;
+            String referencia = null;
+            try{
+                callePrincipal = txtCallePrincipal.getText();
+                calleSecundaria = txtCalleSecundaria.getText();
+                ciudad = txtCiudad.getText();
+                provincia = (String) cboProvincia.getSelectedItem();
+                zip = txtCodigoPostal.getText();
+                referencia = txtReferencia.getText();
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Algun dato no tiene el formato apropiado", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
+            Direccion nuevaDireccion = new Direccion(callePrincipal, calleSecundaria, provincia, ciudad, zip, referencia);
+
+
+            try{
+                userAux.setDireccionEntrega(nuevaDireccion);  //SE AGREGA EL METODO DE PAGO
+            }catch (Exception e){
+                JOptionPane.showMessageDialog(null, "Direccion no actualizada. Algun campo es incorrecto o esta vacio");
+            }
+            JOptionPane.showMessageDialog(null, "Direccion actualizada");
+            textAreaDirActual.setText(userAux.getDireccionEntrega().toString());
+        }
     }
 
     private void mostrarVentanaAgregarMetodoPago() {
@@ -197,7 +270,7 @@ public class Ventanas extends Component {
         panel.add(cboOpciones);
 
         // Mostrar el cuadro de diálogo modal
-        int opcion = JOptionPane.showConfirmDialog(this, panel, "Metodos de pago", JOptionPane.OK_CANCEL_OPTION);
+        int opcion = JOptionPane.showConfirmDialog(this, panel, "Nuevo metodo de pago", JOptionPane.OK_CANCEL_OPTION);
 
         // Verificar la opción seleccionada y la información de autenticación
         if (opcion == JOptionPane.OK_OPTION) {

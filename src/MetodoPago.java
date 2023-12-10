@@ -53,6 +53,7 @@ public class MetodoPago {
 
     private boolean esNumeroTarjetaValido(String numeroTarjeta) {
         String numeroTarjetaSinEspacios = numeroTarjeta.replaceAll("\\s|-", "");
+        this.numeroTarjeta = numeroTarjetaSinEspacios;
         return tieneCantidadDigitosValida(numeroTarjetaSinEspacios, 16, 16);
     }
 
@@ -116,10 +117,23 @@ public class MetodoPago {
         this.tipoDeTarjeta = tipoDeTarjeta;
     }
 
+    public String detectarBanco(){
+        if (numeroTarjeta.matches("^4[0-9]{12}(?:[0-9]{3})?$")) {
+            return "Visa";
+        }
+        // Comprobar si es MasterCard
+        else if (numeroTarjeta.matches("^5[1-5][0-9]{14}$")) {
+            return "MasterCard";
+        }
+        // Si no coincide con ningún patrón conocido
+        return "Desconocido";
+    }
+
     @Override
     public String toString() {
         return "Titular: " + titular + '\n' +
                 " Tipo de tarjeta: " + tipoDeTarjeta + '\n' +
+                " Clase: " + detectarBanco()+ '\n' +
                 " Numero: " + getNumeroTarjetaEnmascarado() + '\n' +
                 " Fecha de vencimiento: " + fechaVencimiento + '\n';
     }
