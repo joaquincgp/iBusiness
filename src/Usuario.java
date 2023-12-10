@@ -213,4 +213,5 @@ public class Usuario {
                 "Cedula: " + cedula + '\n' +
                 "Correo: " + correo + '\n';
     }
+
 }

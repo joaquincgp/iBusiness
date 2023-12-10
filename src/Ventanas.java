@@ -4,9 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class Ventanas extends Component {
     private JTabbedPane tabbedPane1;
@@ -51,7 +49,7 @@ public class Ventanas extends Component {
     private JButton restablecerButton;
     private JPasswordField txtContraActual;
     private JPasswordField txtContraNueva;
-    private Set<Usuario> usuariosRegistrados = new HashSet<>();
+    private Map<String, Usuario> usuariosRegistrados = new HashMap<>();
     private Usuario userAux = null;  //usuario con el que se hacen las operaciones
 
     //Datos quemados para pruebas
@@ -59,7 +57,9 @@ public class Ventanas extends Component {
 
     public Ventanas() {
         //Dato quemado
-        usuariosRegistrados.add(new Usuario("John", "Sanchez", "1805226048","j@gmail.com","chacon#123", aux));
+        Usuario usuarioPrueba = new Usuario("John", "Sanchez", "1805226048", "j@gmail.com", "chacon#123", aux);
+        usuariosRegistrados.put(usuarioPrueba.getCedula(), usuarioPrueba);
+
         registrarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -76,6 +76,7 @@ public class Ventanas extends Component {
                     contrasena = txtPasswordRegistro.getText();
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null, "Algun campo esta vacio");
+                    throw new NullPointerException("Algun campo esta vacio");
                 }
                 String callePrincipal = null;
                 String calleSecundaria = null;
@@ -93,15 +94,18 @@ public class Ventanas extends Component {
                     referencia = txtRef.getText();
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(null, "Algun campo esta vacio");
+                    throw new NullPointerException("Algun campo esta vacio");
                 }
                 Direccion direccion = new Direccion(callePrincipal, calleSecundaria,provincia, ciudad, zip, referencia);
                 Usuario nuevoUsuario = new Usuario(nombre, apellido, cedula, correo, contrasena, direccion);
 
-                if (usuariosRegistrados.add(nuevoUsuario)) {
+                if (!usuariosRegistrados.containsKey(cedula)) {
+                    usuariosRegistrados.put(cedula, nuevoUsuario);
                     limpiarCampos();
                     JOptionPane.showMessageDialog(null, "El usuario se registró correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(null, "El usuario ya está registrado", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException("Usuario ya registrado");
                 }
             }
         });
@@ -128,6 +132,7 @@ public class Ventanas extends Component {
                 userAux = usuarioBuscado;
                 if(usuarioBuscado == null){
                     JOptionPane.showMessageDialog(null, "El usuario no existe o la contraseña es incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new NullPointerException("Usuario no existe");
                 }else{
                     JOptionPane.showMessageDialog(null, "Usuario encontrado. Bienvenido "+usuarioBuscado.getNombre());
 
@@ -360,6 +365,7 @@ public void limpiarInfo(){
                 userAux.setDireccionEntrega(nuevaDireccion);  //SE AGREGA EL METODO DE PAGO
             }catch (Exception e){
                 JOptionPane.showMessageDialog(null, "Direccion no actualizada. Algun campo es incorrecto o esta vacio");
+                throw new RuntimeException("Algun dato no tiene el formato apropiado ");
             }
             JOptionPane.showMessageDialog(null, "Direccion actualizada");
             textAreaDirActual.setText(userAux.getDireccionEntrega().toString());
@@ -409,6 +415,7 @@ public void limpiarInfo(){
                 tipo = (String) cboOpciones.getSelectedItem();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Algun dato no tiene el formato apropiado", "Error", JOptionPane.ERROR_MESSAGE);
+                throw new RuntimeException("Algun dato no tiene el formato apropiado ");
             }
 
             MetodoPago nuevoMetodoPago = new MetodoPago(titular, numero, fecha, codigo, tipo);
@@ -417,10 +424,9 @@ public void limpiarInfo(){
                 userAux.agregarMetodoPago(nuevoMetodoPago);  //SE AGREGA EL METODO DE PAGO
             }catch (Exception e){
                 JOptionPane.showMessageDialog(null, "Metodo de pago no pudo agregarse");
+                throw new RuntimeException("Algun dato no tiene el formato apropiado ");
             }
             JOptionPane.showMessageDialog(null, "Metodo de pago agregado");
-
-
 
             if (userAux != null) {
                 mostrarMetodosPago(userAux);
@@ -428,9 +434,10 @@ public void limpiarInfo(){
         }
     }
 
-    public static Usuario buscarUsuario(Set<Usuario> usuariosRegistrados, String correo, String contrasena) {
-        for (Usuario usuario : usuariosRegistrados) {
-            if (usuario.getCorreo().equals(correo) && usuario.getContrasena().equals(contrasena)) {
+    public static Usuario buscarUsuario(Map<String, Usuario> usuariosRegistrados, String cedula, String contrasena) {
+        if (usuariosRegistrados.containsKey(cedula)) {
+            Usuario usuario = usuariosRegistrados.get(cedula);
+            if (usuario.getContrasena().equals(contrasena)) {
                 return usuario;
             }
         }
