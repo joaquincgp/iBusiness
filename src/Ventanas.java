@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 public class Ventanas extends Component {
     private JTabbedPane tabbedPane1;
@@ -49,8 +50,21 @@ public class Ventanas extends Component {
     private JButton restablecerButton;
     private JPasswordField txtContraActual;
     private JPasswordField txtContraNueva;
+    private JTextField txtNombreProducto;
+    private JTextField txtDescripcion;
+    private JTextField txtPeso;
+    private JTextField txtPrecio;
+    private JSpinner spCantidad;
+    private JComboBox cboTipo;
+    private JButton agregarAlCarritoButton;
+    private JList carritoList;
+    private JButton eliminarProductoButton;
+    private JLabel labelTotal;
+    private JButton crearPedidoButton;
+    private JComboBox cboProductos;
     private Map<String, Usuario> usuariosRegistrados = new HashMap<>();
     private Usuario userAux = null;  //usuario con el que se hacen las operaciones
+    private CarritoDeCompras carrito = new CarritoDeCompras();
 
     //Datos quemados para pruebas
     Direccion aux = new Direccion("hdahda", "ahdhada", "Tungurahua","ajsoja", "190101", "dadad" );
@@ -224,16 +238,75 @@ public class Ventanas extends Component {
                 mostrarVentanaEliminarMetodoPago();
             }
         });
+
+        agregarAlCarritoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(userAux==null){
+                    JOptionPane.showMessageDialog(null, "No se ha iniciado sesion", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException("No se inicia sesion");
+                }
+
+                String nombreProducto = null;
+                String descripcionProducto = null;
+                double pesoProducto = 0.0;
+                double precioProducto = 0.0;
+                int cantidadProducto = 0;
+                String tipoProducto = null;
+
+                try {
+                    nombreProducto = txtNombreProducto.getText();
+                    descripcionProducto = txtDescripcion.getText();
+                    pesoProducto = Double.parseDouble(txtPeso.getText());
+                    precioProducto = Double.parseDouble(txtPrecio.getText());
+                    cantidadProducto = (int) spCantidad.getValue();
+                    tipoProducto = (String) cboTipo.getSelectedItem();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(null, "Algun campo esta vacio" ,"Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException();
+                }
+                Producto nuevoProducto = new Producto(nombreProducto, descripcionProducto, pesoProducto, precioProducto, cantidadProducto, tipoProducto);
+                try {
+                    nuevoProducto.setCategoriaAduana(nuevoProducto.determinarCategoria());
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+                if (!carrito.contieneProducto(nuevoProducto)) {
+                    carrito.agregarProducto(nuevoProducto);
+                    llenarJlist();
+                    labelTotal.setText(""+carrito.calcularTotal());
+                } else {
+                    JOptionPane.showMessageDialog(null, "El producto ya está en el carrito", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                }
+
+
+            }
+        });
+        eliminarProductoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarVentanaEliminarProducto();
+            }
+        });
     }
-public void limpiarInfo(){
-    txtContraActual.setText("");
-    txtContraNueva.setText("");
-    textAreaInfoActual.setText("");
-    textAreaDirActual.setText("");
-    metodosPagoTextArea.setText("");
-    txtUsuarioEditar.setText("");
-    txtPasswordEditar.setText("");
-}
+    private void llenarJlist(){
+        List<Producto> listado=carrito.getProductos();
+        DefaultListModel dlm =new DefaultListModel();
+        for(Producto p:listado){
+            dlm.addElement(p.toString() +'\n');
+        }
+        carritoList.setModel(dlm);
+    }
+
+    public void limpiarInfo(){
+        txtContraActual.setText("");
+        txtContraNueva.setText("");
+        textAreaInfoActual.setText("");
+        textAreaDirActual.setText("");
+        metodosPagoTextArea.setText("");
+        txtUsuarioEditar.setText("");
+        txtPasswordEditar.setText("");
+    }
     private void mostrarVentanaEditarInfo() {
         // Crear un panel para solicitar la información de autenticación
         JPanel panel = new JPanel(new GridLayout(3, 2));
@@ -277,6 +350,39 @@ public void limpiarInfo(){
             textAreaInfoActual.setText(userAux.toString());
         }
     }
+
+    private void mostrarVentanaEliminarProducto() {
+        // Crear un panel para solicitar la información de autenticación
+        JPanel panel = new JPanel(new GridLayout(1, 1));
+        JComboBox<Producto> cboProductos = new JComboBox<>();
+        for (Producto p : carrito.getProductos()) {
+            cboProductos.addItem(p);
+        }
+        panel.add(new JLabel("Producto: "));
+        panel.add(cboProductos);
+
+        // Mostrar el cuadro de diálogo modal
+        int opcion = JOptionPane.showConfirmDialog(this, panel, "Eliminar producto", JOptionPane.OK_CANCEL_OPTION);
+
+        // Verificar la opción seleccionada y la información de autenticación
+        if (opcion == JOptionPane.OK_OPTION) {
+            Producto productoEliminar = (Producto) cboProductos.getSelectedItem();
+            if(productoEliminar == null){
+                JOptionPane.showMessageDialog(null, "El carrito esta vacio","Error", JOptionPane.WARNING_MESSAGE);
+                throw new RuntimeException("Producto no eliminado");
+            }
+
+            try{
+                carrito.eliminarProducto(productoEliminar);
+            }catch (Exception e){
+                throw new RuntimeException("Producto no eliminado");
+            }
+            JOptionPane.showMessageDialog(null, "Producto eliminado");
+            llenarJlist();
+        }
+    }
+
+
     private void mostrarVentanaEliminarMetodoPago() {
         // Crear un panel para solicitar la información de autenticación
         JPanel panel = new JPanel(new GridLayout(1, 1));

@@ -20,17 +20,32 @@ public class CarritoDeCompras {
         }
     }
 
-    public void eliminarProducto(Producto producto) {
+    public void eliminarProducto(Producto producto){
         productos.remove(producto);
     }
+    public boolean contieneProducto(Producto producto) {
+        boolean encontro = false;
+        for(Producto p: productos){
+            if(compararNombresSinEspacios(p.getNombre(), producto.getNombre())){
+                encontro = true;
+            }
+        }
+        return encontro;
+    }
+
+    private boolean compararNombresSinEspacios(String nombre1, String nombre2) {
+        // Eliminar espacios en blanco y comparar los nombres sin importar mayúsculas y minúsculas
+        return nombre1.trim().equalsIgnoreCase(nombre2.trim());
+    }
+
 
     public double calcularTotal() {
         double total = 0.0;
         double subtotal = 0.0;
         double pesototal = 0.0;
-        for (int i = 0; i < productos.size() - 1; i++) {
-            pesototal += productos.get(i).getPesosKilos();
-            subtotal += productos.get(i).calcularSubtotal();
+        for (Producto p: productos) {
+            pesototal += p.getPesosKilos();
+            subtotal += p.calcularSubtotal();
             if (pesototal > 0 && pesototal < 1.362) {
                 pesototal = pesototal * 8;
             } else if (pesototal >= 1.362) {
@@ -41,16 +56,8 @@ public class CarritoDeCompras {
         return total;
     }
 
-    public void listarProductos() {
-        for (Producto p : productos) {
-            System.out.println(productos);
-        }
-    }
 
-    public String generarTrackingID() {
-        UUID idAleatorio = UUID.randomUUID();
-        return idAleatorio.toString();
-    }
+
 
     public List<Producto> getProductos() {
         return this.productos;

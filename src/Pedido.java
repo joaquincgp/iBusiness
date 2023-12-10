@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.util.LinkedList;
+import java.util.UUID;
 
 public class Pedido {
     private String codigoTracking;
@@ -23,8 +24,9 @@ public class Pedido {
         this.total = total;
     }
 
-    public String getCodigoTracking() {
-        return codigoTracking;
+    public String generarTrackingID() {
+        UUID idAleatorio = UUID.randomUUID();
+        return idAleatorio.toString();
     }
 
     public void setCodigoTracking(String codigoTracking) {
