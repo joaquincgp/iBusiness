@@ -1,6 +1,4 @@
 import javax.swing.*;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Usuario {
@@ -15,17 +13,17 @@ public class Usuario {
 
 
     public Usuario(String nombre, String apellido, String cedula, String correo, String contrasena, Direccion direccion) {
-        validarNombreApellido(nombre, apellido);
-        validarCedulaEcuatoriana(cedula);
-        validarCorreo(correo);
-        validarContrasena(contrasena);
+        setNombreApellido(nombre, apellido);
+        setCedulaEcuatoriana(cedula);
+        setCorreo(correo);
+        setContrasena(contrasena);
         this.direccionEntrega = direccion;
         this.historialPedidos = new LinkedList<>();
         this.billetera = new HashSet<>();
     }
 
     //Metodos de validacion para poder asignar las variables en el constructor
-    private void validarNombreApellido(String nombre, String apellido) {
+    public void setNombreApellido(String nombre, String apellido) {
         if (nombre == null || nombre.isEmpty()) {
             JOptionPane.showMessageDialog(null, "El nombre y el apellido no pueden estar vacios", "Error", JOptionPane.ERROR_MESSAGE);
             throw new IllegalArgumentException("El nombre y el apellido no pueden estar vacios");
@@ -42,13 +40,17 @@ public class Usuario {
             JOptionPane.showMessageDialog(null, "El nombre y el apellido no pueden contener espacios adicionales", "Error", JOptionPane.ERROR_MESSAGE);
             throw new IllegalArgumentException("El nombre y el apellido no pueden contener espacios adicionales");
         }
+        if(apellido.matches(".*\\d.*")|| nombre.matches(".*\\d.*")){
+            JOptionPane.showMessageDialog(null, "El nombre y el apellido no pueden contener numeros", "Error", JOptionPane.ERROR_MESSAGE);
+            throw new IllegalArgumentException("El nombre y el apellido no pueden contener numeros");
+        }
         this.nombre = nombre;
         this.apellido = apellido;
     }
 
 
 
-    private void validarCorreo(String correo) {
+    public void setCorreo(String correo) {
         if (correo == null || correo.isEmpty()) {
             JOptionPane.showMessageDialog(null, "El correo no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
             throw new IllegalArgumentException("El correo no puede estar vacío");
@@ -65,7 +67,7 @@ public class Usuario {
 
 
 
-    public void validarCedulaEcuatoriana(String cedula) {
+    public void setCedulaEcuatoriana(String cedula) {
         boolean cedulaCorrecta = false;
         try {
             if (cedula.length() == 10) // ConstantesApp.LongitudCedula
@@ -110,7 +112,7 @@ public class Usuario {
     }
 
 
-    private void validarContrasena(String contrasena) {
+    public void setContrasena(String contrasena) {
         if (contrasena == null || contrasena.isEmpty()) {
             JOptionPane.showMessageDialog(null, "La contraseña no puede estar vacía", "Error", JOptionPane.ERROR_MESSAGE);
             throw new IllegalArgumentException("La contraseña no puede estar vacía");
@@ -130,58 +132,52 @@ public class Usuario {
         this.contrasena = contrasena;
     }
 
-    public void editarPerfil(String nuevoNombre, String nuevoApellido, String nuevoCorreo) {
-        validarNombreApellido(nuevoNombre, nuevoApellido);
-        validarCorreo(nuevoCorreo);
+    public boolean editarPerfil(String nuevoNombre, String nuevoApellido, String nuevoCorreo) {
+        setNombreApellido(nuevoNombre, nuevoApellido);
+        setCorreo(nuevoCorreo);
+        return true;
     }
 
-    public void editarDireccion(Direccion dir){
-        this.direccionEntrega = dir;
-    }
+
 
     public void agregarMetodoPago(MetodoPago nuevoMetodoPago) {
         billetera.add(nuevoMetodoPago);
     }
-
+    public boolean eliminarMetodoDePago(MetodoPago metodoPago) {
+        boolean eliminar = false;
+        if (billetera.contains(metodoPago)) {
+            billetera.remove(metodoPago);
+            eliminar = true;
+        } else {
+            JOptionPane.showMessageDialog(null, "El método de pago no existe en la billetera", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return eliminar;
+    }
 
     public String getNombre() {
         return nombre;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
 
     public String getApellido() {
         return apellido;
     }
 
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
+
 
     public String getCedula() {
         return cedula;
     }
 
-    public void setCedula(String cedula) {
-        this.cedula = cedula;
-    }
 
     public String getCorreo() {
         return correo;
     }
 
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
+
 
     public String getContrasena() {
         return contrasena;
-    }
-
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
     }
 
 

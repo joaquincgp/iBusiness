@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Ventanas extends Component {
@@ -35,7 +36,7 @@ public class Ventanas extends Component {
     private JTextArea txtDireccionActual;
     private JList metodosDePagoList;
     private JButton agregarMetodoDePagoButton;
-    private JButton editarMetodoDePagoButton;
+    private JButton eliminarMetodoDePagoButton;
     private JTextArea textAreaDireccion;
     private JPasswordField txtPasswordEditar;
     private JPasswordField txtPasswordRegistro;
@@ -47,9 +48,9 @@ public class Ventanas extends Component {
     private JButton editarDireccionButton;
     private JTextArea textAreaInfoActual;
     private JButton editarInfoButton;
-    private JTextField txtContraActual;
-    private JTextField txtNuevaContra;
     private JButton restablecerButton;
+    private JPasswordField txtContraActual;
+    private JPasswordField txtContraNueva;
     private Set<Usuario> usuariosRegistrados = new HashSet<>();
     private Usuario userAux = null;  //usuario con el que se hacen las operaciones
 
@@ -184,8 +185,50 @@ public class Ventanas extends Component {
                 mostrarVentanaEditarInfo();
             }
         });
-    }
+        restablecerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) throws RuntimeException{
+                if(userAux==null){
+                    JOptionPane.showMessageDialog(null, "No se ha iniciado sesion", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException("No se inicia sesion");
+                }
+                String contraActual = null;
+                String contraNueva = null;
 
+                contraActual = txtContraActual.getText();
+                contraNueva = txtContraNueva.getText();
+                if(!Objects.equals(contraActual, userAux.getContrasena())){
+                    JOptionPane.showMessageDialog(null, "La contraseña actual no es correcta", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException();
+                }if(Objects.equals(contraActual, contraNueva)){
+                    JOptionPane.showMessageDialog(null, "La nueva contraseña no puede ser la misma", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException();
+                }
+                else{
+                    userAux.setContrasena(contraNueva);
+                    limpiarInfo();
+                    JOptionPane.showMessageDialog(null, "Contraseña restablecida");
+                    userAux = null;
+                    JOptionPane.showMessageDialog(null, "Inicia sesion nuevamente");
+                }
+            }
+        });
+        eliminarMetodoDePagoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mostrarVentanaEliminarMetodoPago();
+            }
+        });
+    }
+public void limpiarInfo(){
+    txtContraActual.setText("");
+    txtContraNueva.setText("");
+    textAreaInfoActual.setText("");
+    textAreaDirActual.setText("");
+    metodosPagoTextArea.setText("");
+    txtUsuarioEditar.setText("");
+    txtPasswordEditar.setText("");
+}
     private void mostrarVentanaEditarInfo() {
         // Crear un panel para solicitar la información de autenticación
         JPanel panel = new JPanel(new GridLayout(3, 2));
@@ -216,20 +259,47 @@ public class Ventanas extends Component {
                 apellidoNuevo = apellido.getText();
                 correoNuevo = correo.getText();
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Algun dato no tiene el formato apropiado", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Algun dato no tiene el formato apropiado. Informacion no actualizada", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
             try{
                 userAux.editarPerfil(nombreNuevo, apellidoNuevo, correoNuevo);
             }catch (Exception e){
-                JOptionPane.showMessageDialog(null, "Informacion no actualizada. Algun campo es incorrecto o esta vacio");
+                throw new RuntimeException("Informacion no actualizada");
             }
-            JOptionPane.showMessageDialog(null, "Informacion actualizada actualizada");
+
+            JOptionPane.showMessageDialog(null, "Informacion actualizada");
             textAreaInfoActual.setText(userAux.toString());
         }
     }
+    private void mostrarVentanaEliminarMetodoPago() {
+        // Crear un panel para solicitar la información de autenticación
+        JPanel panel = new JPanel(new GridLayout(1, 1));
+        JComboBox<MetodoPago> cboMetodoPago = new JComboBox<>();
+        for (MetodoPago mp : userAux.getBilletera()) {
+            cboMetodoPago.addItem(mp);
+        }
+        panel.add(new JLabel("Metodo de pago:"));
+        panel.add(cboMetodoPago);
 
-    private void mostrarVentanaEditarDireccion() {
+        // Mostrar el cuadro de diálogo modal
+        int opcion = JOptionPane.showConfirmDialog(this, panel, "Eliminar metodo de pago", JOptionPane.OK_CANCEL_OPTION);
+
+        // Verificar la opción seleccionada y la información de autenticación
+        if (opcion == JOptionPane.OK_OPTION) {
+            MetodoPago metodoEliminar = (MetodoPago) cboMetodoPago.getSelectedItem();
+            try{
+                userAux.eliminarMetodoDePago(metodoEliminar);
+            }catch (Exception e){
+                throw new RuntimeException("Informacion no actualizada");
+            }
+            JOptionPane.showMessageDialog(null, "Metodo de pago eliminado");
+            metodosPagoTextArea.setText("");
+        }
+    }
+
+
+    private void mostrarVentanaEditarDireccion() throws RuntimeException {
         // Crear un panel para solicitar la información de autenticación
         JPanel panel = new JPanel(new GridLayout(6, 2));
         JTextField txtCallePrincipal = new JTextField();
@@ -279,7 +349,8 @@ public class Ventanas extends Component {
                 referencia = txtReferencia.getText();
 
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Algun dato no tiene el formato apropiado", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Algun dato no tiene el formato apropiado o hay campos vacios", "Error", JOptionPane.ERROR_MESSAGE);
+                throw new RuntimeException("Algun dato no tiene el formato apropiado ");
             }
 
             Direccion nuevaDireccion = new Direccion(callePrincipal, calleSecundaria, provincia, ciudad, zip, referencia);
@@ -370,12 +441,11 @@ public class Ventanas extends Component {
     private void mostrarMetodosPago(Usuario user){
         metodosPagoTextArea.setText("");
         Set<MetodoPago> listado = null;
-        try{
             listado = user.getBilletera();
-        }catch (NullPointerException ex ){
-            JOptionPane.showMessageDialog(null, "El usuario no tiene metodos de pago", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            if(listado==null){
+                JOptionPane.showMessageDialog(null, "El usuario no tiene metodos de pago", "Error", JOptionPane.ERROR_MESSAGE);
+                throw new NullPointerException("El usuario no tiene metodos de pago");
+            }
         int cont = 1;
         for (MetodoPago mp : listado) {
             metodosPagoTextArea.append("TARJETA "+cont+'\n'+mp.toString());
