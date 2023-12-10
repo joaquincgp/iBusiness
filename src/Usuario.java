@@ -130,10 +130,9 @@ public class Usuario {
         this.contrasena = contrasena;
     }
 
-    public void editarPerfil(String nuevoNombre, String nuevoApellido, String nuevoCorreo, String nuevaContrasena) {
+    public void editarPerfil(String nuevoNombre, String nuevoApellido, String nuevoCorreo) {
         validarNombreApellido(nuevoNombre, nuevoApellido);
         validarCorreo(nuevoCorreo);
-        validarContrasena(nuevaContrasena);
     }
 
     public void editarDireccion(Direccion dir){
@@ -216,7 +215,6 @@ public class Usuario {
                 "Nombre: " + nombre + '\n' +
                 "Apellido: " + apellido + '\n' +
                 "Cedula: " + cedula + '\n' +
-                "Correo: " + correo + '\n' +
-                "Contraseña: '" + contrasena + '\n';
+                "Correo: " + correo + '\n';
     }
 }

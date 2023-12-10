@@ -29,11 +29,9 @@ public class Ventanas extends Component {
     private JButton guardarCambiosButton;
     private JLabel nombreActual;
     private JLabel apellidoActual;
-    private JTextField textField1;
     private JButton buscarUsuarioButton;
     private JLabel correoActual;
     private JLabel contrasenaActual;
-    private JTextField textField2;
     private JTextArea txtDireccionActual;
     private JList metodosDePagoList;
     private JButton agregarMetodoDePagoButton;
@@ -47,10 +45,13 @@ public class Ventanas extends Component {
     private JLabel callePActual;
     private JTextArea textAreaDirActual;
     private JButton editarDireccionButton;
-    private JTextField txtNuevoNombre;
-    private JTextField txtNuevoCorreo;
+    private JTextArea textAreaInfoActual;
+    private JButton editarInfoButton;
+    private JTextField txtContraActual;
+    private JTextField txtNuevaContra;
+    private JButton restablecerButton;
     private Set<Usuario> usuariosRegistrados = new HashSet<>();
-    private Usuario userAux = null;
+    private Usuario userAux = null;  //usuario con el que se hacen las operaciones
 
     //Datos quemados para pruebas
     Direccion aux = new Direccion("hdahda", "ahdhada", "Tungurahua","ajsoja", "190101", "dadad" );
@@ -105,12 +106,7 @@ public class Ventanas extends Component {
         });
 
 
-        guardarCambiosButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
 
-            }
-        });
 
         buscarUsuarioButton.addActionListener(new ActionListener() {
             @Override
@@ -133,12 +129,10 @@ public class Ventanas extends Component {
                     JOptionPane.showMessageDialog(null, "El usuario no existe o la contraseña es incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
                 }else{
                     JOptionPane.showMessageDialog(null, "Usuario encontrado. Bienvenido "+usuarioBuscado.getNombre());
-                    nombreActual.setText(usuarioBuscado.getNombre());
-                    apellidoActual.setText(usuarioBuscado.getApellido());
-                    correoActual.setText(usuarioBuscado.getCorreo());
-                    contrasenaActual.setText("********");
+
                     textAreaDirActual.setText(usuarioBuscado.getDireccionEntrega().toString());
 
+                    textAreaInfoActual.setText(usuarioBuscado.toString());
 
                 }
             }
@@ -180,6 +174,59 @@ public class Ventanas extends Component {
                 mostrarVentanaEditarDireccion();
             }
         });
+        editarInfoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(userAux==null){
+                    JOptionPane.showMessageDialog(null, "No se ha iniciado sesion", "Error", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException("No se inicia sesion");
+                }
+                mostrarVentanaEditarInfo();
+            }
+        });
+    }
+
+    private void mostrarVentanaEditarInfo() {
+        // Crear un panel para solicitar la información de autenticación
+        JPanel panel = new JPanel(new GridLayout(3, 2));
+        JTextField nombre = new JTextField();
+        JTextField apellido = new JTextField();
+        JTextField correo = new JTextField();
+
+        panel.add(new JLabel("Nombre:"));
+        panel.add(nombre);
+        nombre.setText(userAux.getNombre());
+        panel.add(new JLabel("Apellido:"));
+        panel.add(apellido);
+        apellido.setText(userAux.getApellido());
+        panel.add(new JLabel("Correo:"));
+        panel.add(correo);
+        correo.setText(userAux.getCorreo());
+
+        // Mostrar el cuadro de diálogo modal
+        int opcion = JOptionPane.showConfirmDialog(this, panel, "Actualizar informacion", JOptionPane.OK_CANCEL_OPTION);
+
+        // Verificar la opción seleccionada y la información de autenticación
+        if (opcion == JOptionPane.OK_OPTION) {
+            String nombreNuevo = null;
+            String apellidoNuevo = null;
+            String correoNuevo = null;
+            try{
+                nombreNuevo = nombre.getText();
+                apellidoNuevo = apellido.getText();
+                correoNuevo = correo.getText();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Algun dato no tiene el formato apropiado", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            try{
+                userAux.editarPerfil(nombreNuevo, apellidoNuevo, correoNuevo);
+            }catch (Exception e){
+                JOptionPane.showMessageDialog(null, "Informacion no actualizada. Algun campo es incorrecto o esta vacio");
+            }
+            JOptionPane.showMessageDialog(null, "Informacion actualizada actualizada");
+            textAreaInfoActual.setText(userAux.toString());
+        }
     }
 
     private void mostrarVentanaEditarDireccion() {
