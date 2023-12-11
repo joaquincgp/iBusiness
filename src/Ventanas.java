@@ -247,6 +247,7 @@ public class Ventanas extends Component {
                     throw new RuntimeException("No se inicia sesion");
                 }
 
+
                 String nombreProducto = null;
                 String descripcionProducto = null;
                 double pesoProducto = 0.0;
@@ -267,10 +268,13 @@ public class Ventanas extends Component {
                 }
                 Producto nuevoProducto = new Producto(nombreProducto, descripcionProducto, pesoProducto, precioProducto, cantidadProducto, tipoProducto);
                 try {
-                    nuevoProducto.setCategoriaAduana(nuevoProducto.determinarCategoria());
+                    Producto.Categoria categoria = nuevoProducto.determinarCategoria();
+                    nuevoProducto.setCategoriaAduana(categoria);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
+
+
                 if (!carrito.contieneProducto(nuevoProducto)) {
                     carrito.agregarProducto(nuevoProducto);
                     llenarJlist();

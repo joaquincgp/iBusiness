@@ -1,7 +1,7 @@
 import javax.swing.*;
 
 public class Producto {
-    private enum Categoria {
+    public enum Categoria {
         B,
         C,
         D,
